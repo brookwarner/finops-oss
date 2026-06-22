@@ -1,0 +1,10 @@
+{
+  "crons": [
+    { "path": "/api/cron/poll-transactions", "schedule": "0 14 * * *" },
+    { "path": "/api/cron/nightly", "schedule": "30 14 * * *" },
+    { "path": "/api/cron/evaluate-alerts", "schedule": "0 19 * * *" },
+    { "path": "/api/cron/weekly-flex", "schedule": "0 7 * * 0" },
+    { "path": "/api/cron/refresh-home-value", "schedule": "17 15 1 * *" },
+    { "path": "/api/cron/snapshot-budgets", "schedule": "45 14 * * *" }
+  ]
+}

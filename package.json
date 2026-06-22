@@ -1,0 +1,47 @@
+{
+  "name": "finops",
+  "version": "0.34.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "db:types": "supabase gen types typescript --project-id YOUR_PROJECT_REF > src/lib/supabase/database.types.ts",
+    "api:schemas": "ts-json-schema-generator --path src/lib/api/responses.ts --tsconfig tsconfig.json --type '*' --expose export --jsDoc extended -o src/lib/api/openapi/responses.generated.json && echo generated"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.106.2",
+    "@visx/curve": "^3.12.0",
+    "@visx/event": "^3.12.0",
+    "@visx/gradient": "^3.12.0",
+    "@visx/scale": "^3.12.0",
+    "@visx/shape": "^3.12.0",
+    "@visx/tooltip": "^3.12.0",
+    "akahu": "^2.5.1",
+    "jose": "^6.2.3",
+    "mcp-handler": "^1.1.0",
+    "next": "15.5.18",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "22.9.0",
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "autoprefixer": "10.4.20",
+    "postcss": "8.4.49",
+    "tailwindcss": "3.4.15",
+    "ts-json-schema-generator": "2.9.0",
+    "typescript": "5.6.3",
+    "vitest": "2.1.5"
+  },
+  "packageManager": "pnpm@9.12.0"
+}

@@ -1,0 +1,2698 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AcceptSuggestionsResponse": {
+      "additionalProperties": false,
+      "description": "POST /api/transactions/accept-suggestions — accept pending review suggestions",
+      "properties": {
+        "accepted": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "accepted"
+      ],
+      "type": "object"
+    },
+    "AccountHoldings": {
+      "additionalProperties": false,
+      "description": "One investment account with its funds rolled up.",
+      "properties": {
+        "accountId": {
+          "type": "string"
+        },
+        "accountName": {
+          "type": "string"
+        },
+        "accountType": {
+          "type": "string"
+        },
+        "annualisedPct": {
+          "description": "Account-level CAGR %, or null when too short / unknown.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "balanceNZD": {
+          "description": "Authoritative per-account value in NZD (accounts.balance_current).",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "currency": {
+          "description": "The shared currency of all funds in this account, or null if mixed.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "heldYears": {
+          "description": "Years the account has been tracked/held, or null.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "holdings": {
+          "items": {
+            "$ref": "#/definitions/HoldingView"
+          },
+          "type": "array"
+        },
+        "inception": {
+          "description": "Effective account inception (`yyyy-mm-dd`), or null.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "inceptionSource": {
+          "description": "Where `inception` came from: a manual seed vs the earliest observed sync.",
+          "enum": [
+            "manual",
+            "observed",
+            null
+          ],
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "returnPct": {
+          "description": "Cumulative return %: totalReturn/totalCost for a single-currency account, else a value-weighted blend of the per-fund %s (the native dollar totals can't be summed across currencies — suppress those, not this).",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "totalCost": {
+          "type": "number"
+        },
+        "totalReturn": {
+          "type": "number"
+        },
+        "totalValue": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "accountId",
+        "accountName",
+        "accountType",
+        "balanceNZD",
+        "currency",
+        "totalValue",
+        "totalReturn",
+        "totalCost",
+        "returnPct",
+        "inception",
+        "inceptionSource",
+        "heldYears",
+        "annualisedPct",
+        "holdings"
+      ],
+      "type": "object"
+    },
+    "AgentReportResponse": {
+      "additionalProperties": false,
+      "description": "POST /api/agent-report — persist + deliver monthly review report",
+      "properties": {
+        "delivered": {
+          "type": "boolean"
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "delivered"
+      ],
+      "type": "object"
+    },
+    "AllocationFork": {
+      "additionalProperties": false,
+      "description": "The final mortgage-vs-investments fork as a head-to-head: route the spare to whichever reaches FI sooner. Both sides carry their FI outcome so a surface can show \"if invest → X | if mortgage → Y\" rather than only the winner.",
+      "properties": {
+        "choice": {
+          "enum": [
+            "mortgage",
+            "invest"
+          ],
+          "type": "string"
+        },
+        "freedPayment": {
+          "type": "number"
+        },
+        "invest": {
+          "additionalProperties": false,
+          "properties": {
+            "fiAge": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "fiDate": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "fiReached": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "fiDate",
+            "fiAge",
+            "fiReached"
+          ],
+          "type": "object"
+        },
+        "monthsSooner": {
+          "description": "invest.fiMonths − payMortgage.fiMonths (months). >0 ⇒ paying down reaches FI sooner; <0 ⇒ investing does; null when an arm doesn't reach FI in horizon.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mortgageRate": {
+          "type": "number"
+        },
+        "nominalReturn": {
+          "type": "number"
+        },
+        "payMortgage": {
+          "additionalProperties": false,
+          "properties": {
+            "fiAge": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "fiDate": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "fiReached": {
+              "type": "boolean"
+            },
+            "interestSaved": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "mortgageFreeDate": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "fiDate",
+            "fiAge",
+            "fiReached",
+            "mortgageFreeDate",
+            "interestSaved"
+          ],
+          "type": "object"
+        },
+        "routed": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "routed",
+        "choice",
+        "freedPayment",
+        "monthsSooner",
+        "mortgageRate",
+        "nominalReturn",
+        "invest",
+        "payMortgage"
+      ],
+      "type": "object"
+    },
+    "AllocationResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/allocation — surplus-allocation recommendation",
+      "properties": {
+        "headline": {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "mortgage",
+                "fi",
+                "none"
+              ],
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "sublabel": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "label",
+            "sublabel"
+          ],
+          "type": "object"
+        },
+        "lumpSum": {
+          "type": "number"
+        },
+        "mortgageVsInvest": {
+          "$ref": "#/definitions/AllocationFork",
+          "description": "Head-to-head behind the final rung (the same simulation that picked `choice`)."
+        },
+        "recommendation": {
+          "type": "string"
+        },
+        "recurringChoice": {
+          "enum": [
+            "mortgage",
+            "invest",
+            "none"
+          ],
+          "type": "string"
+        },
+        "rungs": {
+          "items": {
+            "$ref": "#/definitions/Rung"
+          },
+          "type": "array"
+        },
+        "surplus": {
+          "type": "number"
+        },
+        "total": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "headline",
+        "lumpSum",
+        "mortgageVsInvest",
+        "recommendation",
+        "recurringChoice",
+        "rungs",
+        "surplus",
+        "total"
+      ],
+      "type": "object"
+    },
+    "ApiError": {
+      "additionalProperties": false,
+      "description": "Canonical error body shared by all routes",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "issues": {}
+      },
+      "required": [
+        "error"
+      ],
+      "type": "object"
+    },
+    "ApplySimilarResponse": {
+      "additionalProperties": false,
+      "description": "POST /api/transactions/apply-similar — bulk-categorise by merchant",
+      "properties": {
+        "updated": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "updated"
+      ],
+      "type": "object"
+    },
+    "AssetsDeleteResponse": {
+      "additionalProperties": false,
+      "description": "DELETE /api/assets — remove a manual asset",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ok"
+      ],
+      "type": "object"
+    },
+    "AssetsListResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/assets — list manual assets",
+      "properties": {
+        "assets": {
+          "items": {
+            "$ref": "#/definitions/ManualAsset"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "assets"
+      ],
+      "type": "object"
+    },
+    "AssetsUpsertResponse": {
+      "additionalProperties": false,
+      "description": "POST /api/assets — create or update a manual asset",
+      "properties": {
+        "asset": {
+          "$ref": "#/definitions/ManualAsset"
+        }
+      },
+      "required": [
+        "asset"
+      ],
+      "type": "object"
+    },
+    "BudgetHistoryResponse": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/CategoryHistory"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "cycles": {
+              "items": {
+                "$ref": "#/definitions/CycleHistory"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "cycles"
+          ],
+          "type": "object"
+        }
+      ],
+      "description": "GET /api/budgets/history — budget snapshot history. With `category` param: CategoryHistory. Without: { cycles: CycleHistory[] }."
+    },
+    "BudgetKind": {
+      "enum": [
+        "monthly_cap",
+        "reserve",
+        "ap_amortised",
+        "income",
+        "savings"
+      ],
+      "type": "string"
+    },
+    "BudgetLookupResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/budgets?category=…",
+      "properties": {
+        "budget": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BudgetStatusRow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "category": {
+          "type": "string"
+        },
+        "found": {
+          "type": "boolean"
+        },
+        "period": {
+          "additionalProperties": false,
+          "properties": {
+            "dayOfPeriod": {
+              "type": "number"
+            },
+            "daysLeft": {
+              "type": "number"
+            },
+            "end": {
+              "type": "string"
+            },
+            "periodLength": {
+              "type": "number"
+            },
+            "start": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "start",
+            "end",
+            "dayOfPeriod",
+            "periodLength",
+            "daysLeft"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "found",
+        "category",
+        "period",
+        "budget"
+      ],
+      "type": "object"
+    },
+    "BudgetStatusRow": {
+      "additionalProperties": false,
+      "properties": {
+        "avgMonthlySpend": {
+          "type": "number"
+        },
+        "budgetId": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "string"
+        },
+        "effectiveSpend": {
+          "type": "number"
+        },
+        "group": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "$ref": "#/definitions/BudgetKind"
+        },
+        "netSpent": {
+          "type": "number"
+        },
+        "pct": {
+          "type": "number"
+        },
+        "pendingSpent": {
+          "description": "Provisional pending (unsettled) net-outflow attributed to this category by the rule engine — money spent at the bank but not yet settled. Additive to `effectiveSpend` for a true \"committed so far\" view; 0 when none. Not part of the audited `spent`/`pct`/`status`, which stay settled-only.",
+          "type": "number"
+        },
+        "priorSpend": {
+          "type": "number"
+        },
+        "projected": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "recent": {
+          "items": {
+            "$ref": "#/definitions/TxnPreview"
+          },
+          "type": "array"
+        },
+        "reimbursed": {
+          "type": "number"
+        },
+        "remaining": {
+          "type": "number"
+        },
+        "reserveBalance": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spent": {
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/definitions/RagStatus"
+        },
+        "target": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "budgetId",
+        "categoryId",
+        "category",
+        "group",
+        "kind",
+        "target",
+        "spent",
+        "reimbursed",
+        "netSpent",
+        "effectiveSpend",
+        "pct",
+        "remaining",
+        "status",
+        "projected",
+        "priorSpend",
+        "reserveBalance",
+        "avgMonthlySpend",
+        "recent",
+        "pendingSpent"
+      ],
+      "type": "object"
+    },
+    "BudgetsResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/budgets (no `category` param). Returns a subset of BudgetComputeResult: period, flex, inbox, position, and the (optionally group-filtered) budget rows. Does NOT include shadowCommitted, unallocatedPending, or reserveBuffer.",
+      "properties": {
+        "budgets": {
+          "items": {
+            "$ref": "#/definitions/BudgetStatusRow"
+          },
+          "type": "array"
+        },
+        "flex": {
+          "additionalProperties": false,
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "categoriesIncluded": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "amount",
+            "categoriesIncluded"
+          ],
+          "type": "object"
+        },
+        "inbox": {
+          "additionalProperties": false,
+          "properties": {
+            "categorisedInWindow": {
+              "type": "number"
+            },
+            "inboxInWindow": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "categorisedInWindow",
+            "inboxInWindow"
+          ],
+          "type": "object"
+        },
+        "period": {
+          "additionalProperties": false,
+          "properties": {
+            "dayOfPeriod": {
+              "type": "number"
+            },
+            "daysLeft": {
+              "type": "number"
+            },
+            "end": {
+              "type": "string"
+            },
+            "periodLength": {
+              "type": "number"
+            },
+            "start": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "start",
+            "end",
+            "dayOfPeriod",
+            "periodLength",
+            "daysLeft"
+          ],
+          "type": "object"
+        },
+        "position": {
+          "$ref": "#/definitions/Position"
+        }
+      },
+      "required": [
+        "period",
+        "flex",
+        "inbox",
+        "position",
+        "budgets"
+      ],
+      "type": "object"
+    },
+    "Cadence": {
+      "enum": [
+        "weekly",
+        "fortnightly",
+        "monthly",
+        "quarterly",
+        "annual"
+      ],
+      "type": "string"
+    },
+    "CashflowLine": {
+      "additionalProperties": false,
+      "properties": {
+        "cashZeroDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "creditZeroDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "key": {
+          "$ref": "#/definitions/ScenarioKey"
+        },
+        "label": {
+          "type": "string"
+        },
+        "series": {
+          "items": {
+            "$ref": "#/definitions/SeriesPoint"
+          },
+          "type": "array"
+        },
+        "weeksToCredit": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "key",
+        "label",
+        "series",
+        "cashZeroDate",
+        "creditZeroDate",
+        "weeksToCredit"
+      ],
+      "type": "object"
+    },
+    "CashflowResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/cashflow — unified cashflow game-plan",
+      "properties": {
+        "context": {
+          "additionalProperties": false,
+          "properties": {
+            "baselineWeeklyIncome": {
+              "type": "number"
+            },
+            "receivables": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "receivables",
+            "baselineWeeklyIncome"
+          ],
+          "type": "object"
+        },
+        "creditHeadroom": {
+          "type": "number"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/definitions/ForecastEvent"
+          },
+          "type": "array"
+        },
+        "inflows": {
+          "items": {
+            "$ref": "#/definitions/Inflow"
+          },
+          "type": "array"
+        },
+        "lines": {
+          "items": {
+            "$ref": "#/definitions/CashflowLine"
+          },
+          "type": "array"
+        },
+        "nextBills": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "count": {
+                  "type": "number"
+                },
+                "date": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "date",
+                "amount",
+                "count"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startLiquid": {
+          "type": "number"
+        },
+        "verdict": {
+          "additionalProperties": false,
+          "properties": {
+            "makesIt": {
+              "type": "boolean"
+            },
+            "margin": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "makesIt",
+            "margin"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "context",
+        "creditHeadroom",
+        "events",
+        "inflows",
+        "lines",
+        "nextBills",
+        "startLiquid",
+        "verdict"
+      ],
+      "type": "object"
+    },
+    "CategoriseTransactionsResponse": {
+      "additionalProperties": false,
+      "description": "PATCH /api/transactions/categorise — assign category to transactions",
+      "properties": {
+        "category": {
+          "description": "Resolved category name, present when the caller used the name-based path.",
+          "type": "string"
+        },
+        "similarCount": {
+          "type": "number"
+        },
+        "similarMerchant": {
+          "description": "Merchant to pass to applySimilar when the learned rule is merchant-based; null for description rules or bulk/uncategorise.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "updated": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "similarCount",
+        "updated"
+      ],
+      "type": "object"
+    },
+    "CategoryHistory": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "found": {
+          "type": "boolean"
+        },
+        "series": {
+          "items": {
+            "$ref": "#/definitions/HistoryPoint"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "found",
+        "category",
+        "series"
+      ],
+      "type": "object"
+    },
+    "CycleHistory": {
+      "additionalProperties": false,
+      "properties": {
+        "budgets": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "carryover": {
+                "type": "number"
+              },
+              "category": {
+                "type": "string"
+              },
+              "effective_spend": {
+                "type": "number"
+              },
+              "group": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "kind": {
+                "$ref": "#/definitions/BudgetKind"
+              },
+              "pct": {
+                "type": "number"
+              },
+              "period_end": {
+                "type": "string"
+              },
+              "period_start": {
+                "type": "string"
+              },
+              "reimbursed": {
+                "type": "number"
+              },
+              "reserve_balance": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "spent": {
+                "type": "number"
+              },
+              "status": {
+                "$ref": "#/definitions/RagStatus"
+              },
+              "target": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "carryover",
+              "category",
+              "effective_spend",
+              "group",
+              "kind",
+              "pct",
+              "period_end",
+              "period_start",
+              "reimbursed",
+              "reserve_balance",
+              "spent",
+              "status",
+              "target"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "period_end": {
+          "type": "string"
+        },
+        "period_start": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "period_start",
+        "period_end",
+        "budgets"
+      ],
+      "type": "object"
+    },
+    "DailyBurnDay": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "description": "UTC calendar day, ISO yyyy-mm-dd.",
+          "type": "string"
+        },
+        "dayOfCycle": {
+          "description": "1-based position within the cycle.",
+          "type": "number"
+        },
+        "spend": {
+          "description": "Net outflow that day (Σ -amount over monthly_cap txns); negative on a refund day.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "date",
+        "spend",
+        "dayOfCycle"
+      ],
+      "type": "object"
+    },
+    "DailyBurnResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/spend/daily-burn",
+      "properties": {
+        "cycleEnd": {
+          "type": "string"
+        },
+        "cyclePerDay": {
+          "description": "spentSoFar ÷ dayOfPeriod — the whole-cycle average daily pace.",
+          "type": "number"
+        },
+        "cycleStart": {
+          "type": "string"
+        },
+        "dayOfPeriod": {
+          "description": "Day number within the cycle as of `now` (1-based).",
+          "type": "number"
+        },
+        "days": {
+          "description": "Elapsed days only, oldest → newest.",
+          "items": {
+            "$ref": "#/definitions/DailyBurnDay"
+          },
+          "type": "array"
+        },
+        "periodLength": {
+          "description": "Total days in the cycle.",
+          "type": "number"
+        },
+        "plannedPerDay": {
+          "description": "Σ active monthly_cap targets ÷ periodLength — the planned daily drag (matches the forecast).",
+          "type": "number"
+        },
+        "priorPerDay": {
+          "description": "Average over the `trailingDays` days before the trailing window; null when the cycle is too young to compare.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spentSoFar": {
+          "description": "Σ days.spend — variable spend so far this cycle.",
+          "type": "number"
+        },
+        "trailingDays": {
+          "description": "Window size actually used (clamped to elapsed days).",
+          "type": "number"
+        },
+        "trailingPerDay": {
+          "description": "Average daily burn over the last `trailingDays` days — the headline pace.",
+          "type": "number"
+        },
+        "trend": {
+          "description": "trailingPerDay − (priorPerDay ?? cyclePerDay); positive = pace rising.",
+          "type": "number"
+        },
+        "vsPlan": {
+          "description": "trailingPerDay − plannedPerDay; positive = burning hotter than plan.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "cycleEnd",
+        "cyclePerDay",
+        "cycleStart",
+        "dayOfPeriod",
+        "days",
+        "periodLength",
+        "plannedPerDay",
+        "priorPerDay",
+        "spentSoFar",
+        "trailingDays",
+        "trailingPerDay",
+        "trend",
+        "vsPlan"
+      ],
+      "type": "object"
+    },
+    "EmergencyFundResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/buffer — emergency fund (cash buffer) status",
+      "properties": {
+        "accountName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "balance": {
+          "type": "number"
+        },
+        "configured": {
+          "description": "Whether an account is designated as the emergency fund.",
+          "type": "boolean"
+        },
+        "essentialMonthly": {
+          "type": "number"
+        },
+        "funded": {
+          "type": "boolean"
+        },
+        "monthsCovered": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pctFunded": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "shortfall": {
+          "type": "number"
+        },
+        "target": {
+          "type": "number"
+        },
+        "targetMonths": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "accountName",
+        "balance",
+        "configured",
+        "essentialMonthly",
+        "funded",
+        "monthsCovered",
+        "pctFunded",
+        "shortfall",
+        "target",
+        "targetMonths"
+      ],
+      "type": "object"
+    },
+    "FIProjection": {
+      "additionalProperties": false,
+      "properties": {
+        "fiAge": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "fiDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "months": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "reached": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "reached",
+        "months",
+        "fiDate",
+        "fiAge"
+      ],
+      "type": "object"
+    },
+    "FIResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/fi",
+      "properties": {
+        "annualRecurringSpend": {
+          "type": "number"
+        },
+        "assumptions": {
+          "additionalProperties": false,
+          "properties": {
+            "actualReturnAnnualisedPct": {
+              "description": "The same portfolio's annualised (CAGR) return as a fraction, or null when no investment account has a usable inception date. Companion to actualReturnPct — the per-year rate the cumulative figure works out to.",
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "actualReturnPct": {
+              "description": "Cumulative (\"since purchase\") return of the FI investment portfolio, as a fraction (0.15 = +15%). Value-weighted blend across investment accounts (KiwiSaver excluded — locked until 65). Backward-looking reality check, NOT fed into the projection.",
+              "type": "number"
+            },
+            "contributionByAccount": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "net": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "name",
+                  "net"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "contributionWindowMonths": {
+              "type": "number"
+            },
+            "fiAssetAccounts": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "balance": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "balance"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "kiwiSaverBalance": {
+              "type": "number"
+            },
+            "realReturn": {
+              "type": "number"
+            },
+            "spendBasis": {
+              "type": "string"
+            },
+            "swr": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "swr",
+            "realReturn",
+            "actualReturnPct",
+            "actualReturnAnnualisedPct",
+            "contributionWindowMonths",
+            "fiAssetAccounts",
+            "contributionByAccount",
+            "kiwiSaverBalance",
+            "spendBasis"
+          ],
+          "type": "object"
+        },
+        "fiAssets": {
+          "type": "number"
+        },
+        "fiNumber": {
+          "type": "number"
+        },
+        "gap": {
+          "type": "number"
+        },
+        "monthlyContribution": {
+          "type": "number"
+        },
+        "pctToFI": {
+          "type": "number"
+        },
+        "projection": {
+          "$ref": "#/definitions/FIProjection"
+        },
+        "targetAge": {
+          "type": "number"
+        },
+        "targetYear": {
+          "type": "number"
+        },
+        "vsTargetYears": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "annualRecurringSpend",
+        "assumptions",
+        "fiAssets",
+        "fiNumber",
+        "gap",
+        "monthlyContribution",
+        "pctToFI",
+        "projection",
+        "targetAge",
+        "targetYear",
+        "vsTargetYears"
+      ],
+      "type": "object"
+    },
+    "ForecastAssumptions": {
+      "additionalProperties": false,
+      "description": "What the forecast is based on — surfaced so the UI can show a \"what this assumes\" panel (and the user can spot a wrong inference). All of it is auto-derived.",
+      "properties": {
+        "bills": {
+          "description": "Each committed bill's seeded post-day + amount, and where the seed came from.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "amount": {
+                "type": "number"
+              },
+              "day": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "source": {
+                "enum": [
+                  "actual",
+                  "target"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "day",
+              "amount",
+              "source"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "dailyBurn": {
+          "description": "Combined monthly_cap allowance ÷ cycle length — the daily discretionary drag.",
+          "type": "number"
+        },
+        "income": {
+          "description": "One entry per detected pay stream (or a single monthly-budget fallback).",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "amount": {
+                "type": "number"
+              },
+              "cadenceDays": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "lastDate": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source": {
+                "enum": [
+                  "inferred",
+                  "fallback"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "cadenceDays",
+              "amount",
+              "lastDate",
+              "source"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "income",
+        "dailyBurn",
+        "bills"
+      ],
+      "type": "object"
+    },
+    "ForecastEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "delta": {
+          "type": "number"
+        },
+        "kind": {
+          "enum": [
+            "income",
+            "committed",
+            "variable"
+          ],
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "delta",
+        "label",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "ForecastResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/forecast",
+      "properties": {
+        "assumptions": {
+          "$ref": "#/definitions/ForecastAssumptions"
+        },
+        "billsDue": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "count": {
+                  "type": "number"
+                },
+                "date": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "date",
+                "amount",
+                "count"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The next major bill cluster the verdict is judged against (null => payday fallback)."
+        },
+        "context": {
+          "additionalProperties": false,
+          "properties": {
+            "reservesEarmarked": {
+              "type": "number"
+            },
+            "revolvingDrawn": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "reservesEarmarked",
+            "revolvingDrawn"
+          ],
+          "type": "object"
+        },
+        "events": {
+          "description": "The dated drivers behind the walk (pay/bills/daily burn), date-sorted.",
+          "items": {
+            "$ref": "#/definitions/ForecastEvent"
+          },
+          "type": "array"
+        },
+        "horizonDays": {
+          "type": "number"
+        },
+        "nextPayday": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "amount": {
+                  "type": "number"
+                },
+                "date": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "date",
+                "amount"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "series": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "balance": {
+                "type": "number"
+              },
+              "date": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "date",
+              "balance"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "startBalance": {
+          "type": "number"
+        },
+        "trough": {
+          "additionalProperties": false,
+          "properties": {
+            "balance": {
+              "type": "number"
+            },
+            "date": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "date",
+            "balance"
+          ],
+          "type": "object"
+        },
+        "verdict": {
+          "additionalProperties": false,
+          "properties": {
+            "makesIt": {
+              "type": "boolean"
+            },
+            "margin": {
+              "type": "number"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "makesIt",
+            "margin",
+            "text"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "assumptions",
+        "billsDue",
+        "context",
+        "events",
+        "horizonDays",
+        "nextPayday",
+        "series",
+        "startBalance",
+        "trough",
+        "verdict"
+      ],
+      "type": "object"
+    },
+    "HistoryPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "carryover": {
+          "type": "number"
+        },
+        "effective_spend": {
+          "type": "number"
+        },
+        "kind": {
+          "$ref": "#/definitions/BudgetKind"
+        },
+        "pct": {
+          "type": "number"
+        },
+        "period_end": {
+          "type": "string"
+        },
+        "period_start": {
+          "type": "string"
+        },
+        "reimbursed": {
+          "type": "number"
+        },
+        "reserve_balance": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "spent": {
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/definitions/RagStatus"
+        },
+        "target": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "period_start",
+        "period_end",
+        "target",
+        "spent",
+        "reimbursed",
+        "effective_spend",
+        "pct",
+        "status",
+        "kind",
+        "reserve_balance",
+        "carryover"
+      ],
+      "type": "object"
+    },
+    "HoldingView": {
+      "additionalProperties": false,
+      "description": "A single fund prepared for display.",
+      "properties": {
+        "annualisedPct": {
+          "description": "Compound annual growth rate %, or null when too short / unknown.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "costBasis": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "fundId": {
+          "type": "string"
+        },
+        "inception": {
+          "description": "Effective inception used for annualisation (`yyyy-mm-dd`), or null.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "logo": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "returnPct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "returns": {
+          "type": "number"
+        },
+        "shares": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "symbol": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "fundId",
+        "symbol",
+        "name",
+        "logo",
+        "currency",
+        "shares",
+        "value",
+        "returns",
+        "costBasis",
+        "returnPct",
+        "inception",
+        "annualisedPct"
+      ],
+      "type": "object"
+    },
+    "IncomeCyclePoint": {
+      "additionalProperties": false,
+      "properties": {
+        "period_end": {
+          "type": "string"
+        },
+        "period_start": {
+          "type": "string"
+        },
+        "plannedTotal": {
+          "type": "number"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/definitions/IncomeSourcePoint"
+          },
+          "type": "array"
+        },
+        "total": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "period_start",
+        "period_end",
+        "total",
+        "plannedTotal",
+        "sources"
+      ],
+      "type": "object"
+    },
+    "IncomeHistoryResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/income/history — per-cycle plan-vs-actual income",
+      "properties": {
+        "cycles": {
+          "items": {
+            "$ref": "#/definitions/IncomeCyclePoint"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "cycles"
+      ],
+      "type": "object"
+    },
+    "IncomeSourcePoint": {
+      "additionalProperties": false,
+      "properties": {
+        "actual": {
+          "type": "number"
+        },
+        "categoryId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "plan": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "categoryId",
+        "name",
+        "actual",
+        "plan"
+      ],
+      "type": "object"
+    },
+    "Inflow": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "expectedDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "likelihood": {
+          "$ref": "#/definitions/Likelihood"
+        },
+        "taxRate": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "amount",
+        "likelihood",
+        "expectedDate",
+        "taxRate"
+      ],
+      "type": "object"
+    },
+    "InvestmentInceptionResponse": {
+      "additionalProperties": false,
+      "description": "PATCH /api/investments/inception — set account's manual investing-since date",
+      "properties": {
+        "account": {
+          "type": "string"
+        },
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ok": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ok",
+        "account",
+        "date"
+      ],
+      "type": "object"
+    },
+    "InvestmentsResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/investments — investment holdings grouped by account + portfolio roll-up",
+      "properties": {
+        "accounts": {
+          "items": {
+            "$ref": "#/definitions/AccountHoldings"
+          },
+          "type": "array"
+        },
+        "portfolio": {
+          "$ref": "#/definitions/PortfolioSummary"
+        }
+      },
+      "required": [
+        "accounts",
+        "portfolio"
+      ],
+      "type": "object"
+    },
+    "Likelihood": {
+      "enum": [
+        "likely",
+        "uncertain"
+      ],
+      "type": "string"
+    },
+    "ManualAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "autoRefreshed": {
+          "type": "boolean"
+        },
+        "balance": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "feedsFI": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inflow": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ManualAssetInflow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "institution": {
+          "type": "string"
+        },
+        "loan": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ManualAssetLoan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "refreshedAt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "institution",
+        "type",
+        "currency",
+        "balance",
+        "refreshedAt",
+        "feedsFI",
+        "autoRefreshed",
+        "loan",
+        "inflow"
+      ],
+      "type": "object"
+    },
+    "ManualAssetInflow": {
+      "additionalProperties": false,
+      "properties": {
+        "expectedDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "likelihood": {
+          "enum": [
+            "likely",
+            "uncertain"
+          ],
+          "type": "string"
+        },
+        "preTax": {
+          "type": "boolean"
+        },
+        "taxRate": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "likelihood",
+        "expectedDate",
+        "preTax",
+        "taxRate"
+      ],
+      "type": "object"
+    },
+    "ManualAssetLoan": {
+      "additionalProperties": false,
+      "properties": {
+        "anchorBalance": {
+          "type": "number"
+        },
+        "anchorDate": {
+          "type": "string"
+        },
+        "annualRate": {
+          "type": "number"
+        },
+        "repaymentCategoryId": {
+          "type": "string"
+        },
+        "repaymentCategoryName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "annualRate",
+        "anchorBalance",
+        "anchorDate",
+        "repaymentCategoryId",
+        "repaymentCategoryName"
+      ],
+      "type": "object"
+    },
+    "MortgageResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/mortgage",
+      "properties": {
+        "baseFreeDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "baseMonths": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "interestSaved": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "monthsSaved": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "scenFreeDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scenMonths": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "baseFreeDate",
+        "baseMonths",
+        "interestSaved",
+        "monthsSaved",
+        "scenFreeDate",
+        "scenMonths"
+      ],
+      "type": "object"
+    },
+    "NetWorthAccount": {
+      "additionalProperties": false,
+      "properties": {
+        "balance": {
+          "type": "number"
+        },
+        "isLiability": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "balance",
+        "isLiability"
+      ],
+      "type": "object"
+    },
+    "NetWorthResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/net-worth",
+      "properties": {
+        "accounts": {
+          "items": {
+            "$ref": "#/definitions/NetWorthAccount"
+          },
+          "type": "array"
+        },
+        "assets": {
+          "type": "number"
+        },
+        "liabilities": {
+          "type": "number"
+        },
+        "net": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "accounts",
+        "assets",
+        "liabilities",
+        "net"
+      ],
+      "type": "object"
+    },
+    "PortfolioSummary": {
+      "additionalProperties": false,
+      "description": "Whole-portfolio roll-up across every investment/KiwiSaver account.",
+      "properties": {
+        "annualisedCoverageNZD": {
+          "description": "NZD value of the accounts the annualised blend covers (≤ valueNZD); less than valueNZD when some accounts still need an investing-since date.",
+          "type": "number"
+        },
+        "annualisedPct": {
+          "description": "NZD-value-weighted blend of per-account annualised (CAGR) %, or null when no account has a usable inception date.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "returnPct": {
+          "description": "NZD-value-weighted blend of per-account cumulative return %, or null.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "valueNZD": {
+          "description": "Total NZD value across all accounts that hold funds.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "valueNZD",
+        "returnPct",
+        "annualisedPct",
+        "annualisedCoverageNZD"
+      ],
+      "type": "object"
+    },
+    "Position": {
+      "additionalProperties": false,
+      "properties": {
+        "expenses": {
+          "additionalProperties": false,
+          "properties": {
+            "actual": {
+              "type": "number"
+            },
+            "budget": {
+              "type": "number"
+            },
+            "pending": {
+              "description": "Net pending (unsettled) outflow folded into `projected`; 0 if none.",
+              "type": "number"
+            },
+            "projected": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "actual",
+            "projected",
+            "budget",
+            "pending"
+          ],
+          "type": "object"
+        },
+        "income": {
+          "additionalProperties": false,
+          "properties": {
+            "actual": {
+              "type": "number"
+            },
+            "expected": {
+              "type": "number"
+            },
+            "expectedByNow": {
+              "type": "number"
+            },
+            "planned": {
+              "type": "number"
+            },
+            "recentRunRate": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "actual",
+            "expected",
+            "expectedByNow",
+            "planned",
+            "recentRunRate"
+          ],
+          "type": "object"
+        },
+        "net": {
+          "additionalProperties": false,
+          "properties": {
+            "actual": {
+              "type": "number"
+            },
+            "planned": {
+              "description": "Structural plan-vs-plan surplus/deficit: Σ income budgets − Σ expense budgets. Unlike `actual`/`projected` (which blend in this cycle's real spend & receipts), this answers the design-time question \"do the budgets I've SET commit me to spending more than I plan to earn?\" — independent of how any one cycle is tracking. Negative ⇒ over-committed budgets.",
+              "type": "number"
+            },
+            "projected": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "actual",
+            "projected",
+            "planned"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "income",
+        "expenses",
+        "net"
+      ],
+      "type": "object"
+    },
+    "PresentedSub": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "amountMax": {
+          "type": "number"
+        },
+        "amountMin": {
+          "type": "number"
+        },
+        "annual": {
+          "type": "number"
+        },
+        "cadence": {
+          "$ref": "#/definitions/Cadence"
+        },
+        "categoryId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "lastSeen": {
+          "type": "string"
+        },
+        "monthly": {
+          "type": "number"
+        },
+        "nextExpected": {
+          "type": "string"
+        },
+        "priceChanged": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "lapsed"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "displayName",
+        "cadence",
+        "amount",
+        "monthly",
+        "annual",
+        "nextExpected",
+        "lastSeen",
+        "status",
+        "categoryId",
+        "amountMin",
+        "amountMax",
+        "priceChanged"
+      ],
+      "type": "object"
+    },
+    "RagStatus": {
+      "enum": [
+        "ok",
+        "warning",
+        "over"
+      ],
+      "type": "string"
+    },
+    "RepaymentArm": {
+      "additionalProperties": false,
+      "properties": {
+        "fiAge": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "fiDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fiMonths": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "fiReached": {
+          "type": "boolean"
+        },
+        "mortgageFreeDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mortgageFreeMonths": {
+          "description": "When this arm's mortgage clears (months from now / \"YYYY-MM\").",
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "fiMonths",
+        "fiDate",
+        "fiAge",
+        "fiReached",
+        "mortgageFreeMonths",
+        "mortgageFreeDate"
+      ],
+      "type": "object"
+    },
+    "RepaymentFIResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/fi/repayment — mortgage-vs-invest FI head-to-head",
+      "properties": {
+        "extraPerMonth": {
+          "type": "number"
+        },
+        "freedPayment": {
+          "description": "Scheduled P&I that frees up at payoff and redirects to investing.",
+          "type": "number"
+        },
+        "investArm": {
+          "$ref": "#/definitions/RepaymentArm",
+          "description": "Keep investing the extra; mortgage runs to its scheduled payoff."
+        },
+        "lumpSum": {
+          "type": "number"
+        },
+        "monthsSooner": {
+          "description": "investArm.fiMonths − payMortgageArm.fiMonths. >0 ⇒ paying down reaches FI sooner. null when either arm doesn't reach FI within the horizon.",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "mortgage": {
+          "$ref": "#/definitions/ScenarioResult",
+          "description": "The mortgage-only what-if (free-date shift + lifetime interest saved) from the extra repayment — so the panel needn't recompute it."
+        },
+        "payMortgageArm": {
+          "$ref": "#/definitions/RepaymentArm",
+          "description": "Throw the extra (and any lump) at the mortgage; clears sooner."
+        },
+        "verdict": {
+          "description": "Which arm wins on the FI date. \"tie\" when equal (or neither reaches).",
+          "enum": [
+            "pay_mortgage",
+            "invest",
+            "tie"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "extraPerMonth",
+        "freedPayment",
+        "investArm",
+        "lumpSum",
+        "monthsSooner",
+        "mortgage",
+        "payMortgageArm",
+        "verdict"
+      ],
+      "type": "object"
+    },
+    "ReviewResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/review — transactions awaiting categorisation review",
+      "properties": {
+        "pending": {
+          "type": "number"
+        },
+        "transactions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "account": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "amount": {
+                "type": "number"
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "merchant": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "occurred_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "occurred_at",
+              "amount",
+              "merchant",
+              "description",
+              "account"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "pending",
+        "transactions"
+      ],
+      "type": "object"
+    },
+    "Rung": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "detail": {
+          "additionalProperties": false,
+          "properties": {
+            "lines": {
+              "items": {
+                "$ref": "#/definitions/RungLine"
+              },
+              "type": "array"
+            },
+            "why": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "lines",
+            "why"
+          ],
+          "type": "object"
+        },
+        "key": {
+          "$ref": "#/definitions/RungKey"
+        },
+        "tag": {
+          "additionalProperties": false,
+          "properties": {
+            "cls": {
+              "enum": [
+                "guaranteed",
+                "need",
+                "risky"
+              ],
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "text",
+            "cls"
+          ],
+          "type": "object"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "title",
+        "amount",
+        "tag",
+        "detail"
+      ],
+      "type": "object"
+    },
+    "RungKey": {
+      "enum": [
+        "debt",
+        "reserve",
+        "revolving",
+        "emergency",
+        "mortgage",
+        "invest"
+      ],
+      "type": "string"
+    },
+    "RungLine": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ScenarioKey": {
+      "enum": [
+        "actual",
+        "onBudget",
+        "bareEssentials",
+        "custom"
+      ],
+      "type": "string"
+    },
+    "ScenarioResult": {
+      "additionalProperties": false,
+      "properties": {
+        "baseFreeDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "baseMonths": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "interestSaved": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "monthsSaved": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "scenFreeDate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scenMonths": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "baseMonths",
+        "scenMonths",
+        "monthsSaved",
+        "interestSaved",
+        "baseFreeDate",
+        "scenFreeDate"
+      ],
+      "type": "object"
+    },
+    "SeriesPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "balance": {
+          "type": "number"
+        },
+        "date": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "date",
+        "balance"
+      ],
+      "type": "object"
+    },
+    "SetBudgetTargetResponse": {
+      "additionalProperties": false,
+      "description": "PATCH /api/budgets/target (success branch). The route returns `{ category, ...result }` where result is `{ ok: true; previousTarget: number; newTarget: number }`.",
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "newTarget": {
+          "type": "number"
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "previousTarget": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "category",
+        "ok",
+        "previousTarget",
+        "newTarget"
+      ],
+      "type": "object"
+    },
+    "SubscriptionsResponse": {
+      "additionalProperties": false,
+      "description": "GET /api/subscriptions — detected recurring charges",
+      "properties": {
+        "subscriptions": {
+          "items": {
+            "$ref": "#/definitions/PresentedSub"
+          },
+          "type": "array"
+        },
+        "totals": {
+          "additionalProperties": false,
+          "properties": {
+            "annual": {
+              "type": "number"
+            },
+            "count": {
+              "type": "number"
+            },
+            "monthly": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "monthly",
+            "annual",
+            "count"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "subscriptions",
+        "totals"
+      ],
+      "type": "object"
+    },
+    "TxnPreview": {
+      "additionalProperties": false,
+      "properties": {
+        "accountType": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "amount": {
+          "type": "number"
+        },
+        "category_id": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "merchant": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "occurred_at": {
+          "type": "string"
+        },
+        "pending": {
+          "description": "True for provisional pending (unsettled) rows attributed by the rule engine — rendered with a \"pending\" hint and never persisted.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "occurred_at",
+        "amount",
+        "merchant",
+        "description",
+        "category_id",
+        "accountType"
+      ],
+      "type": "object"
+    }
+  }
+}

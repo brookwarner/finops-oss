@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   FinOps design tokens — "calm private-bank"
+   Semantic layer only. Components reference these via Tailwind
+   utilities, never raw hex. Values are "R G B" channel triplets
+   so Tailwind's /opacity modifiers work (rgb(var(--x) / a)).
+   Dark mode (below) is a swap of this one block.
+   ============================================================ */
+:root {
+  /* surfaces */
+  --bg: 244 246 244;
+  --surface: 255 255 255;
+  --sunken: 240 242 240;
+
+  /* ink */
+  --ink: 24 32 28;
+  --ink-strong: 14 20 16;
+  --muted: 113 128 122;
+  --faint: 154 164 158;
+
+  /* structure */
+  --hairline: 231 235 231;
+
+  /* accent (interactive, links) */
+  --accent: 47 107 83;
+  --accent-weak: 234 242 237;
+
+  /* status — text tone + brighter bar tone + tint */
+  --positive: 47 107 83;
+  --positive-bar: 47 143 102;
+  --positive-weak: 234 242 237;
+
+  --negative: 179 84 61;
+  --negative-bar: 192 86 62;
+  --negative-weak: 249 236 232;
+
+  --warning: 169 120 31;
+  --warning-bar: 207 148 56;
+
+  /* outflow (the "Out" leg — warm, not alarming) */
+  --outflow: 199 121 79;
+
+  /* kind pills */
+  --reserve: 91 106 138;
+  --reserve-weak: 238 240 244;
+  --chart-violet: 130 95 175;
+  --autopay: 106 114 105;
+  --autopay-weak: 238 240 238;
+  --savings: 38 122 124;
+  --savings-weak: 230 242 242;
+
+  /* elevation */
+  --shadow-card: 0 1px 2px rgba(16, 30, 24, 0.04), 0 10px 26px -16px rgba(16, 30, 24, 0.14);
+  --shadow-row: 0 1px 2px rgba(16, 30, 24, 0.05);
+  --shadow-pop: 0 4px 12px -2px rgba(16, 30, 24, 0.12), 0 12px 32px -12px rgba(16, 30, 24, 0.18);
+
+  /* radii */
+  --radius-card: 20px;
+  --radius-row: 16px;
+  --radius-control: 11px;
+
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------
+   Dark theme — same semantics, swapped values. Applied by the
+   `dark` class on <html> (set pre-paint to avoid a flash).
+   ------------------------------------------------------------ */
+.dark {
+  --bg: 14 19 16;
+  --surface: 22 28 24;
+  --sunken: 30 37 31;
+
+  --ink: 230 234 229;
+  --ink-strong: 243 246 241;
+  --muted: 154 164 157;
+  --faint: 105 115 108;
+
+  --hairline: 40 48 41;
+
+  --accent: 92 193 145;
+  --accent-weak: 23 37 29;
+
+  --positive: 92 193 145;
+  --positive-bar: 63 174 124;
+  --positive-weak: 22 36 28;
+
+  --negative: 224 132 106;
+  --negative-bar: 208 107 80;
+  --negative-weak: 42 26 20;
+
+  --warning: 216 169 85;
+  --warning-bar: 207 148 56;
+
+  --outflow: 214 143 99;
+
+  --reserve: 146 162 198;
+  --reserve-weak: 27 34 48;
+  --chart-violet: 176 148 224;
+  --autopay: 154 164 157;
+  --autopay-weak: 30 37 31;
+  --savings: 110 196 196;
+  --savings-weak: 22 40 40;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 30px -16px rgba(0, 0, 0, 0.6);
+  --shadow-row: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-pop: 0 4px 14px -2px rgba(0, 0, 0, 0.5), 0 14px 36px -12px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}
+
+@layer base {
+  body {
+    background: rgb(var(--bg));
+    color: rgb(var(--ink));
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2 {
+    letter-spacing: -0.02em;
+    color: rgb(var(--ink-strong));
+  }
+}
+
+@layer utilities {
+  /* Animated bar fills — bars grow into place on load. */
+  @keyframes bar-grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  .animate-bar {
+    transform-origin: left center;
+    animation: bar-grow 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-bar {
+      animation: none;
+    }
+  }
+}
