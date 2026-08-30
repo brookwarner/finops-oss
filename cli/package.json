@@ -1,0 +1,17 @@
+{
+  "name": "@the owner/finops-cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Token-efficient CLI for the FinOps API (budgets, review, net worth).",
+  "type": "module",
+  "bin": {
+    "finops": "./finops.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "finops.mjs",
+    "lib/"
+  ]
+}

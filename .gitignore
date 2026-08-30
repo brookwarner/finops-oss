@@ -1,0 +1,23 @@
+node_modules
+.next
+.env.local
+.env*.local
+*.log
+.DS_Store
+.vercel
+coverage
+tsconfig.tsbuildinfo
+next-env.d.ts
+supabase/.temp
+
+# Local PocketSmith export (PII)
+data/pocketsmith/
+
+# Superpowers visual brainstorming scratch
+.superpowers/
+
+# Claude Code agent worktrees (transient, harness-managed)
+.claude/worktrees/
+scripts/demo/.migrations/
+supabase/migrations.real.bak/
+.claude/launch.json

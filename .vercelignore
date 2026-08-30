@@ -1,0 +1,23 @@
+# Belt-and-braces: Vercel CLI uploads from the directory you run it in
+# (FinOps/), so the parent personal-ops repo never reaches Vercel.
+# This file exists to make that intent explicit.
+
+# Never upload local secrets.
+.env.local
+.env*.local
+
+# Never upload the design + plan docs (not needed at runtime).
+# Anchored to repo root so it doesn't also match src/app/docs/ (the API
+# reference route) — an unanchored `docs/` excludes that route from the
+# upload and it 404s in prod while building fine locally.
+/docs/
+
+# Never upload any tests or build artefacts.
+tests/
+coverage/
+*.log
+
+# Supabase migrations run from the local CLI against Supabase directly —
+# they don't need to ship to Vercel. Anchored to repo root so it doesn't
+# also match src/lib/supabase/.
+/supabase/
