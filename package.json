@@ -40,7 +40,7 @@
     "postcss": "8.5.26",
     "tailwindcss": "3.4.15",
     "ts-json-schema-generator": "2.9.0",
-    "typescript": "5.6.3",
+    "typescript": "7.0.2",
     "vitest": "2.1.5"
   },
   "packageManager": "pnpm@9.12.0"
