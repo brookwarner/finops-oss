@@ -14,7 +14,7 @@
     "api:schemas": "ts-json-schema-generator --path src/lib/api/responses.ts --tsconfig tsconfig.json --type '*' --expose export --jsDoc extended -o src/lib/api/openapi/responses.generated.json && echo generated"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.120.0",
+    "@anthropic-ai/sdk": "^0.122.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
