@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FinOps · Logo</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green:#1B9A5F; --green-d:#34BE7C;
+    --terra:#C5642F; --terra-d:#E08A57;
+    --ink:#16211B; --paper:#F3F3EC; --tile:#0F1714;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Manrope',system-ui,sans-serif; font-weight:500;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:72px 40px 120px;}
+  .eyebrow{font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(22,33,27,.42);}
+  h1{font-size:46px; font-weight:800; letter-spacing:-.03em; margin:14px 0 0;}
+  .lede{font-size:17px; line-height:1.55; color:rgba(22,33,27,.62); max-width:540px; margin:16px 0 0;}
+  .sect-label{font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(22,33,27,.40); margin:0 0 18px;}
+  section{margin-top:72px;}
+  .card{background:#FBFBF6; border:1px solid rgba(22,33,27,.07); border-radius:20px;}
+  .panel-dark{background:var(--tile); border:1px solid rgba(255,255,255,.06); border-radius:20px;}
+
+  /* hero */
+  .hero{display:grid; grid-template-columns:300px 1fr; gap:28px; align-items:stretch; margin-top:48px;}
+  .hero .big{display:grid; place-items:center; padding:40px;}
+  .hero .big svg{width:150px; height:150px;}
+  .hero-meta{padding:34px 38px; display:flex; flex-direction:column; justify-content:center; gap:22px;}
+  .swatches{display:flex; gap:14px; flex-wrap:wrap;}
+  .sw{display:flex; align-items:center; gap:10px; font-size:13px; font-weight:600;}
+  .chip{width:30px; height:30px; border-radius:9px; box-shadow:0 1px 2px rgba(0,0,0,.12);}
+  .sw small{display:block; font-weight:600; color:rgba(22,33,27,.45); font-size:11.5px; letter-spacing:.02em;}
+
+  /* lockup row */
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .lock{display:flex; align-items:center; gap:16px; padding:40px;}
+  .lock svg{width:52px; height:52px; flex:none;}
+  .wm{font-weight:800; font-size:34px; letter-spacing:-.025em; line-height:1;}
+  .wm.on-dark{color:#F2F4F0;}
+  .wm .ops{color:rgba(22,33,27,.5);}
+  .wm.on-dark .ops{color:rgba(242,244,240,.45);}
+
+  /* header mock */
+  .appbar{display:flex; align-items:center; gap:11px; padding:16px 20px; border-radius:14px; background:var(--tile);}
+  .appbar svg{width:28px;height:28px;}
+  .appbar .t{font-weight:800;font-size:19px;letter-spacing:-.02em;color:#F2F4F0;}
+  .appbar .v{font-weight:600;font-size:12px;color:rgba(242,244,240,.38);}
+  .appbar .sp{margin-left:auto;display:flex;gap:14px;}
+  .appbar .ic{width:18px;height:18px;border:2px solid rgba(242,244,240,.5);}
+  .appbar .ic.r{border-radius:99px;}
+  .appbar .ic.s{border-radius:4px;}
+
+  /* splash */
+  .splash{height:380px; border-radius:20px; background:var(--tile);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; position:relative; overflow:hidden;}
+  .splash svg{width:92px;height:92px;}
+  .splash .wm{font-size:30px;}
+  .splash .bar{position:absolute; bottom:46px; width:90px; height:4px; border-radius:99px; background:rgba(255,255,255,.10); overflow:hidden;}
+  .splash .bar i{display:block; width:62%; height:100%; border-radius:99px; background:var(--green-d);}
+  .splash .glow{position:absolute; inset:0; background:radial-gradient(420px 220px at 50% 38%, rgba(52,190,124,.10), transparent 70%);}
+
+  /* favicon scales */
+  .favrow{display:flex; align-items:flex-end; gap:40px; padding:44px 40px; flex-wrap:wrap;}
+  .fav{display:flex; flex-direction:column; align-items:center; gap:12px;}
+  .fav .tileimg{image-rendering:auto;}
+  .fav small{font-size:11.5px; font-weight:600; color:rgba(22,33,27,.45);}
+  .browsertab{display:inline-flex; align-items:center; gap:9px; background:var(--tile); border-radius:10px 10px 0 0; padding:11px 16px 13px; max-width:260px;}
+  .browsertab img{width:16px;height:16px;}
+  .browsertab span{font-size:13px;color:rgba(242,244,240,.8);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* assets / downloads */
+  .dl{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px;}
+  .dl a{display:flex; align-items:center; gap:13px; padding:14px 16px; border-radius:13px; background:#FBFBF6;
+    border:1px solid rgba(22,33,27,.08); text-decoration:none; color:var(--ink); transition:.15s;}
+  .dl a:hover{border-color:rgba(27,154,95,.5); background:#fff; transform:translateY(-1px);}
+  .dl .pv{width:40px;height:40px;border-radius:9px;flex:none;display:grid;place-items:center;overflow:hidden;}
+  .dl .pv img{width:100%;height:100%;}
+  .dl .nm{font-weight:700;font-size:13.5px;}
+  .dl .ds{font-weight:600;font-size:11.5px;color:rgba(22,33,27,.45);margin-top:1px;}
+
+  /* clearspace / dont */
+  .rules{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .ruletitle{font-weight:700;font-size:14px;margin:0 0 4px;}
+  .ruletext{font-size:13px;color:rgba(22,33,27,.55);line-height:1.5;margin:0;}
+
+  code{font-family:'SF Mono',ui-monospace,Menlo,monospace; font-size:12.5px; background:rgba(22,33,27,.06); padding:2px 6px; border-radius:5px;}
+  .codeblock{background:var(--tile); color:#cfe9dc; border-radius:14px; padding:22px 24px; overflow:auto; font-family:ui-monospace,Menlo,monospace; font-size:12.5px; line-height:1.7;}
+  .codeblock .tag{color:#E08A57;} .codeblock .at{color:#34BE7C;} .codeblock .st{color:#cdd6d0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">FinOps · Brand</div>
+    <h1>The Flow Bar</h1>
+    <p class="lede">Income meets spend in a single mark — the app's signature in/out bar, distilled. Green is money in, terracotta is money out. One idea, legible from a 512px PWA tile down to a 16px favicon.</p>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="panel-dark big">
+      <svg viewBox="0 0 100 100" aria-label="FinOps mark">
+        <path d="M47 38 H23 A12 12 0 0 0 11 50 A12 12 0 0 0 23 62 H47 Z" fill="#34BE7C"/>
+        <path d="M53 38 H77 A12 12 0 0 1 89 50 A12 12 0 0 1 77 62 H53 Z" fill="#E08A57"/>
+      </svg>
+    </div>
+    <div class="card hero-meta">
+      <div class="swatches">
+        <div class="sw"><span class="chip" style="background:#1B9A5F"></span><div>Income<small>#1B9A5F</small></div></div>
+        <div class="sw"><span class="chip" style="background:#C5642F"></span><div>Spend<small>#C5642F</small></div></div>
+        <div class="sw"><span class="chip" style="background:#0F1714"></span><div>Tile<small>#0F1714</small></div></div>
+      </div>
+      <div class="swatches" style="opacity:.9">
+        <div class="sw"><span class="chip" style="background:#34BE7C"></span><div>Income · dark<small>#34BE7C</small></div></div>
+        <div class="sw"><span class="chip" style="background:#E08A57"></span><div>Spend · dark<small>#E08A57</small></div></div>
+      </div>
+      <p class="ruletext" style="margin-top:4px">On dark themes the mark uses the brighter pair; on light themes it uses the deeper pair. The geometry never changes.</p>
+    </div>
+  </div>
+
+  <!-- LOCKUP -->
+  <section>
+    <p class="sect-label">Wordmark lockup</p>
+    <div class="grid2">
+      <div class="card lock">
+        <svg viewBox="0 0 100 100"><path d="M47 38 H23 A12 12 0 0 0 11 50 A12 12 0 0 0 23 62 H47 Z" fill="#1B9A5F"/><path d="M53 38 H77 A12 12 0 0 1 89 50 A12 12 0 0 1 77 62 H53 Z" fill="#C5642F"/></svg>
+        <span class="wm">Fin<span class="ops">Ops</span></span>
+      </div>
+      <div class="panel-dark lock">
+        <svg viewBox="0 0 100 100"><path d="M47 38 H23 A12 12 0 0 0 11 50 A12 12 0 0 0 23 62 H47 Z" fill="#34BE7C"/><path d="M53 38 H77 A12 12 0 0 1 89 50 A12 12 0 0 1 77 62 H53 Z" fill="#E08A57"/></svg>
+        <span class="wm on-dark">Fin<span class="ops">Ops</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- IN CONTEXT -->
+  <section>
+    <p class="sect-label">In context</p>
+    <div class="grid2" style="grid-template-columns:1.25fr 1fr; align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="appbar">
+          <svg viewBox="0 0 100 100"><path d="M47 38 H23 A12 12 0 0 0 11 50 A12 12 0 0 0 23 62 H47 Z" fill="#34BE7C"/><path d="M53 38 H77 A12 12 0 0 1 89 50 A12 12 0 0 1 77 62 H53 Z" fill="#E08A57"/></svg>
+          <span class="t">FinOps</span><span class="v">v0.4.1</span>
+          <span class="sp"><span class="ic r"></span><span class="ic s"></span></span>
+        </div>
+        <div class="browsertab">
+          <img src="assets/favicon-32.png" alt="" />
+          <span>FinOps — June budget</span>
+        </div>
+        <p class="ruletext">App header and browser tab. The dark tile sits comfortably on the warm near-black chrome and stands out on light browser toolbars alike.</p>
+      </div>
+      <div class="splash">
+        <div class="glow"></div>
+        <svg viewBox="0 0 100 100"><path d="M47 38 H23 A12 12 0 0 0 11 50 A12 12 0 0 0 23 62 H47 Z" fill="#34BE7C"/><path d="M53 38 H77 A12 12 0 0 1 89 50 A12 12 0 0 1 77 62 H53 Z" fill="#E08A57"/></svg>
+        <span class="wm on-dark">Fin<span class="ops">Ops</span></span>
+        <div class="bar"><i></i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAVICON SCALES -->
+  <section>
+    <p class="sect-label">Favicon &amp; app-icon scales</p>
+    <div class="card favrow">
+      <div class="fav"><img class="tileimg" src="assets/favicon-16.png" width="16" height="16" alt="16"/><small>16 · favicon</small></div>
+      <div class="fav"><img class="tileimg" src="assets/favicon-32.png" width="32" height="32" alt="32"/><small>32 · favicon</small></div>
+      <div class="fav"><img class="tileimg" src="assets/favicon-48.png" width="48" height="48" alt="48"/><small>48 · favicon</small></div>
+      <div class="fav"><img class="tileimg" src="assets/apple-touch-icon.png" width="72" height="72" alt="180"/><small>180 · apple-touch</small></div>
+      <div class="fav"><img class="tileimg" src="assets/icon-192.png" width="96" height="96" alt="192"/><small>192 · PWA</small></div>
+      <div class="fav"><img class="tileimg" src="assets/icon-maskable-512.png" width="96" height="96" style="border-radius:0" alt="maskable"/><small>512 · maskable</small></div>
+    </div>
+  </section>
+
+  <!-- USAGE RULES -->
+  <section>
+    <p class="sect-label">A few rules</p>
+    <div class="rules">
+      <div class="card" style="padding:26px 28px">
+        <p class="ruletitle">Clear space</p>
+        <p class="ruletext">Keep padding equal to the bar's height on all sides. Inside an app tile the mark occupies ~62% of the square — don't let it touch the corner radius.</p>
+      </div>
+      <div class="card" style="padding:26px 28px">
+        <p class="ruletitle">Don't</p>
+        <p class="ruletext">Don't recolor the segments, swap their order (green is always in, left), add a gradient, or set the mark on a busy photo without the solid tile behind it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPLEMENTATION -->
+  <section>
+    <p class="sect-label">Drop-in head tags</p>
+    <div class="codeblock">
+<span class="tag">&lt;link</span> <span class="at">rel</span>=<span class="st">"icon"</span> <span class="at">type</span>=<span class="st">"image/png"</span> <span class="at">sizes</span>=<span class="st">"32x32"</span> <span class="at">href</span>=<span class="st">"assets/favicon-32.png"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="at">rel</span>=<span class="st">"icon"</span> <span class="at">type</span>=<span class="st">"image/png"</span> <span class="at">sizes</span>=<span class="st">"16x16"</span> <span class="at">href</span>=<span class="st">"assets/favicon-16.png"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="at">rel</span>=<span class="st">"apple-touch-icon"</span> <span class="at">href</span>=<span class="st">"assets/apple-touch-icon.png"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;link</span> <span class="at">rel</span>=<span class="st">"manifest"</span> <span class="at">href</span>=<span class="st">"assets/site.webmanifest"</span><span class="tag">&gt;</span>
+    </div>
+  </section>
+
+  <!-- DOWNLOADS -->
+  <section>
+    <p class="sect-label">Files</p>
+    <div class="dl">
+      <a href="assets/finops-mark.svg" download><span class="pv" style="background:#fff"><img src="assets/finops-mark.svg" alt=""/></span><span><span class="nm">Mark · light</span><span class="ds">SVG · vector</span></span></a>
+      <a href="assets/finops-mark-dark.svg" download><span class="pv" style="background:#0F1714"><img src="assets/finops-mark-dark.svg" alt=""/></span><span><span class="nm">Mark · dark</span><span class="ds">SVG · vector</span></span></a>
+      <a href="assets/finops-icon-dark.svg" download><span class="pv"><img src="assets/finops-icon-dark.svg" alt=""/></span><span><span class="nm">App icon · dark</span><span class="ds">SVG · tiled</span></span></a>
+      <a href="assets/finops-icon-light.svg" download><span class="pv"><img src="assets/finops-icon-light.svg" alt=""/></span><span><span class="nm">App icon · light</span><span class="ds">SVG · tiled</span></span></a>
+      <a href="assets/icon-512.png" download><span class="pv"><img src="assets/icon-512.png" alt=""/></span><span><span class="nm">PWA icon</span><span class="ds">PNG · 512</span></span></a>
+      <a href="assets/icon-maskable-512.png" download><span class="pv"><img src="assets/icon-maskable-512.png" alt=""/></span><span><span class="nm">Maskable</span><span class="ds">PNG · 512</span></span></a>
+      <a href="assets/icon-192.png" download><span class="pv"><img src="assets/icon-192.png" alt=""/></span><span><span class="nm">PWA icon</span><span class="ds">PNG · 192</span></span></a>
+      <a href="assets/apple-touch-icon.png" download><span class="pv"><img src="assets/apple-touch-icon.png" alt=""/></span><span><span class="nm">Apple touch</span><span class="ds">PNG · 180</span></span></a>
+      <a href="assets/favicon-48.png" download><span class="pv"><img src="assets/favicon-48.png" alt=""/></span><span><span class="nm">Favicon</span><span class="ds">PNG · 48</span></span></a>
+      <a href="assets/favicon-32.png" download><span class="pv"><img src="assets/favicon-32.png" alt=""/></span><span><span class="nm">Favicon</span><span class="ds">PNG · 32</span></span></a>
+      <a href="assets/favicon-16.png" download><span class="pv"><img src="assets/favicon-16.png" alt=""/></span><span><span class="nm">Favicon</span><span class="ds">PNG · 16</span></span></a>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

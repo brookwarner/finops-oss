@@ -1,0 +1,2 @@
+-- Private-installation seasonal-budget backfill intentionally omitted.
+-- Add reserve budgets through the application for your own household.

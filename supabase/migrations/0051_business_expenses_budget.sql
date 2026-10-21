@@ -1,0 +1,2 @@
+-- Private-installation budget/rule backfill intentionally omitted.
+-- New installations get the generic taxonomy from migration 0049.
