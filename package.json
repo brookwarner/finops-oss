@@ -28,7 +28,7 @@
     "ipaddr.js": "2.5.0",
     "jose": "^6.2.10",
     "mcp-handler": "2.3.0",
-    "next": "15.5.27",
+    "next": "16.4.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "standardwebhooks": "1.1.1",
